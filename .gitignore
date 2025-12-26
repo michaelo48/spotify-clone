@@ -1,0 +1,9 @@
+# Secrets and credentials
+.env
+.env.local
+*.pem
+*.key
+
+# OS-generated files
+.DS_Store
+Thumbs.db

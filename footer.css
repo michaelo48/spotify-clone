@@ -1,0 +1,15 @@
+
+footer {
+    background: #333;
+    color: #fff;
+    padding: 15px 20px;
+    position: fixed;
+    bottom: 0;
+    left: 250px;
+    right: 0;
+    transition: left 0.3s ease;
+}
+
+footer.expanded {
+    left: 0;
+}
