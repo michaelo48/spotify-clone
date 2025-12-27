@@ -69,8 +69,18 @@ async function sideNav() {
 }
 
 // Login function
+// Login function
 function loginToSpotify() {
+    console.log('=== SPOTIFY LOGIN DEBUG ===');
+    console.log('CLIENT_ID:', CLIENT_ID);
+    console.log('REDIRECT_URI:', REDIRECT_URI);
+    console.log('REDIRECT_URI (encoded):', encodeURIComponent(REDIRECT_URI));
+    
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+    
+    console.log('Full Auth URL:', authUrl);
+    console.log('========================');
+    
     window.location.href = authUrl;
 }
 
