@@ -1,0 +1,58 @@
+:root {
+    /* Colors */
+    --color-primary: #333;
+    --color-primary-hover: #575757;
+    --color-white: #fff;
+    --color-white-rgb: 255, 255, 255;
+    --color-background-dark: rgb(30, 30, 30);
+
+    /* Spacing */
+    --spacing-xs: 0.0625rem;
+    --spacing-sm: 0.3125rem;
+    --spacing-md: 0.625rem;
+    --spacing-lg: 0.75rem;
+    --spacing-xl: 1rem;
+    --spacing-2xl: 1.25rem;
+    --spacing-3xl: 1.5rem;
+    --spacing-4xl: 3rem;
+    --spacing-5xl: 3.75rem;
+
+    /* Sidebar */
+    --sidebar-width: 15.625rem;
+    --sidebar-collapsed-offset: -11.625rem;
+
+    /* Transitions */
+    --transition-speed: 0.3s;
+    --transition-ease: ease;
+
+    /* Border Radius */
+    --radius-sm: 0.125rem;
+    --radius-md: 0.25rem;
+    --radius-lg: 1.25rem;
+
+    /* Font Sizes */
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+
+    /* Z-Index */
+    --z-sidebar: 100;
+    --z-footer: 150;
+    --z-toggle: 200;
+
+    /* Dimensions */
+    --search-input-height: 1.25rem;
+    --search-input-width: 10rem;
+}
+
+/* Reset default browser spacing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}

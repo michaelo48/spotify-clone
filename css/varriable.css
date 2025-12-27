@@ -1,0 +1,15 @@
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #333;
+    --sidebar-hover: #575757;
+    --text-color: #f10000;
+    --spacing-sm: 10px;
+    --spacing-md: 12px;
+    --spacing-lg: 15px;
+    --spacing-xl: 20px;
+    --spacing-xxl: 60px;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --border-radius: 4px;
+    --transition-speed: 0.3s;
+}

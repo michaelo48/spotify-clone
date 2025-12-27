@@ -1,0 +1,12 @@
+@import url('root.css');
+
+footer {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 15px 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-footer);
+}

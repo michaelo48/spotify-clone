@@ -1,0 +1,45 @@
+@import url('root.css');
+
+/* Sidebar */
+.sidenav {
+    width: var(--sidebar-width);
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--color-primary);
+    padding-top: var(--spacing-5xl);
+    transition: transform var(--transition-speed) var(--transition-ease);
+    z-index: var(--z-sidebar);
+}
+
+.sidenav.collapsed {
+    transform: translateX(var(--sidebar-collapsed-offset));
+}
+
+.sidenav a {
+    display: block;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    color: var(--color-white);
+    text-decoration: none;
+    font-size: var(--font-size-base);
+}
+
+.sidenav a:hover {
+    background-color: var(--color-primary-hover);
+}
+
+/* Toggle Button */
+.menu-toggle {
+    position: fixed;
+    top: var(--spacing-xl);
+    left: var(--spacing-xl);
+    z-index: var(--z-toggle);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: var(--spacing-md) 0.9375rem;
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-md);
+}

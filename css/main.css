@@ -1,0 +1,16 @@
+@import url('root.css');
+
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) var(--transition-ease);
+    min-height: 100vh;
+}
+
+.main-wrapper.expanded {
+    margin-left: var(--spacing-4xl);
+}
+
+/* Main Content */
+main {
+    padding: var(--spacing-3xl);
+}

@@ -1,0 +1,40 @@
+@import url('root.css');
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-2xl) var(--spacing-md) var(--spacing-5xl);
+    background-color: var(--color-background-dark);
+    color: var(--color-white);
+    margin-left: calc(var(--sidebar-width) * -1);
+    padding-left: calc(var(--sidebar-width) + var(--spacing-5xl));
+}
+
+.searchBar {
+    appearance: none;
+    border: 1px solid var(--color-white);
+    padding: var(--spacing-sm);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+}
+
+.searchBar button {
+    appearance: none;
+    border: 1px solid var(--color-white);
+    padding: var(--spacing-xs);
+    background-color: var(--color-white);
+    border-radius: var(--radius-sm);
+}
+
+.searchBar input {
+    appearance: none;
+    border: 1px solid var(--color-white);
+    padding: var(--spacing-xs);
+    background-color: var(--color-white);
+    border-radius: var(--radius-sm);
+    height: var(--search-input-height);
+    width: var(--search-input-width);
+}
