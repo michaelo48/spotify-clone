@@ -1,5 +1,5 @@
 // Spotify API configuration
-const CLIENT_ID = 'b7994b73084b47a6a0b168fd02727a7f';
+const CLIENT_ID = 'da6d0a08e3f7425088c56b2f90a9ff00';
 const REDIRECT_URI = 'https://michaelo48.netlify.app'; // e.g., 'http://localhost:3000/callback'
 const SCOPES = 'playlist-read-private playlist-read-collaborative';
 
