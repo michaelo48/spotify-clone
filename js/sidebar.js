@@ -1,5 +1,5 @@
 // Spotify API configuration
-const CLIENT_ID = 'your_new_client_id_here'; // Replace with your new Client ID
+const CLIENT_ID = 'da6d0a08e3f7425088c56b2f90a9ff00'; // Replace with your new Client ID
 const REDIRECT_URI = 'https://michaelo48.netlify.app';
 const SCOPES = 'playlist-read-private playlist-read-collaborative';
 
