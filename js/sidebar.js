@@ -81,7 +81,13 @@ async function getSpotifyPlaylists() {
             })
         ]);
 
+        console.log('Playlists response status:', playlistsResponse.status);
+        console.log('Recent played response status:', recentResponse.status);
+
         if (!playlistsResponse.ok) {
+            const errorData = await playlistsResponse.json();
+            console.error('Playlists error:', errorData);
+            
             if (playlistsResponse.status === 401) {
                 localStorage.removeItem('spotify_access_token');
                 return '<a href="#" id="spotify-login-btn">Login to Spotify</a>';
@@ -90,16 +96,23 @@ async function getSpotifyPlaylists() {
         }
 
         const playlistsData = await playlistsResponse.json();
-        const recentData = await recentResponse.json();
+        console.log('Playlists data:', playlistsData);
 
-        // Extract playlist URIs from recently played (in order of most recent)
-        const recentPlaylistUris = [];
-        recentData.items.forEach(item => {
-            const context = item.context;
-            if (context && context.type === 'playlist' && !recentPlaylistUris.includes(context.uri)) {
-                recentPlaylistUris.push(context.uri);
-            }
-        });
+        // Handle recently played separately - don't fail if this errors
+        let recentPlaylistUris = [];
+        if (recentResponse.ok) {
+            const recentData = await recentResponse.json();
+            console.log('Recent data:', recentData);
+            
+            recentData.items.forEach(item => {
+                const context = item.context;
+                if (context && context.type === 'playlist' && !recentPlaylistUris.includes(context.uri)) {
+                    recentPlaylistUris.push(context.uri);
+                }
+            });
+        } else {
+            console.warn('Could not fetch recently played:', recentResponse.status);
+        }
 
         // Sort playlists: recently played first, then the rest
         const playlists = playlistsData.items;
@@ -107,15 +120,11 @@ async function getSpotifyPlaylists() {
             const aIndex = recentPlaylistUris.indexOf(a.uri);
             const bIndex = recentPlaylistUris.indexOf(b.uri);
             
-            // If both are in recent, sort by recent order
             if (aIndex !== -1 && bIndex !== -1) {
                 return aIndex - bIndex;
             }
-            // If only a is in recent, a comes first
             if (aIndex !== -1) return -1;
-            // If only b is in recent, b comes first
             if (bIndex !== -1) return 1;
-            // Neither in recent, keep original order
             return 0;
         });
 
