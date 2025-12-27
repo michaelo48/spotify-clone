@@ -3,7 +3,7 @@ const CLIENT_ID = 'da6d0a08e3f7425088c56b2f90a9ff00'; // Replace with your new C
 const REDIRECT_URI = 'https://michaelo48.netlify.app';
 const SCOPES = 'playlist-read-private playlist-read-collaborative';
 
-// Generate code verifier and challenge for PKCE
+
 function generateRandomString(length) {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const values = crypto.getRandomValues(new Uint8Array(length));
@@ -23,7 +23,7 @@ function base64encode(input) {
         .replace(/\//g, '_');
 }
 
-// Check if we're returning from Spotify auth
+
 async function handleCallback() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
@@ -31,7 +31,7 @@ async function handleCallback() {
     if (code) {
         const codeVerifier = localStorage.getItem('code_verifier');
         
-        // Exchange code for token
+
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
             headers: {
@@ -71,30 +71,62 @@ async function getSpotifyPlaylists() {
     }
 
     try {
-        const response = await fetch('https://api.spotify.com/v1/me/playlists', {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
+        // Fetch playlists and recently played in parallel
+        const [playlistsResponse, recentResponse] = await Promise.all([
+            fetch('https://api.spotify.com/v1/me/playlists', {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            }),
+            fetch('https://api.spotify.com/v1/me/player/recently-played?limit=50', {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            })
+        ]);
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                // Token expired
+        if (!playlistsResponse.ok) {
+            if (playlistsResponse.status === 401) {
                 localStorage.removeItem('spotify_access_token');
                 return '<a href="#" id="spotify-login-btn">Login to Spotify</a>';
             }
             throw new Error('Failed to fetch playlists');
         }
 
-        const data = await response.json();
+        const playlistsData = await playlistsResponse.json();
+        const recentData = await recentResponse.json();
+
+        // Extract playlist URIs from recently played (in order of most recent)
+        const recentPlaylistUris = [];
+        recentData.items.forEach(item => {
+            const context = item.context;
+            if (context && context.type === 'playlist' && !recentPlaylistUris.includes(context.uri)) {
+                recentPlaylistUris.push(context.uri);
+            }
+        });
+
+        // Sort playlists: recently played first, then the rest
+        const playlists = playlistsData.items;
+        const sortedPlaylists = playlists.sort((a, b) => {
+            const aIndex = recentPlaylistUris.indexOf(a.uri);
+            const bIndex = recentPlaylistUris.indexOf(b.uri);
+            
+            // If both are in recent, sort by recent order
+            if (aIndex !== -1 && bIndex !== -1) {
+                return aIndex - bIndex;
+            }
+            // If only a is in recent, a comes first
+            if (aIndex !== -1) return -1;
+            // If only b is in recent, b comes first
+            if (bIndex !== -1) return 1;
+            // Neither in recent, keep original order
+            return 0;
+        });
+
+        // Build HTML - Liked Songs first
+        let playlistHTML = `<a href="https://open.spotify.com/collection/tracks" target="_blank">♥ Liked Songs</a>`;
         
-        // Generate playlist links
-        let playlistHTML = '';
-        data.items.forEach(playlist => {
+        sortedPlaylists.forEach(playlist => {
             playlistHTML += `<a href="${playlist.external_urls.spotify}" target="_blank">${playlist.name}</a>`;
         });
-        
-        return playlistHTML || '<a href="#">No playlists found</a>';
+
+        return playlistHTML;
     } catch (error) {
         console.error('Error fetching playlists:', error);
         return '<a href="#">Error loading playlists</a>';
