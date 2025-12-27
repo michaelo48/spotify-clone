@@ -1,30 +1,73 @@
 // Spotify API configuration
-const CLIENT_ID = 'da6d0a08e3f7425088c56b2f90a9ff00';
-const REDIRECT_URI = 'https://michaelo48.netlify.app'; // e.g., 'http://localhost:3000/callback'
+const CLIENT_ID = 'your_new_client_id_here'; // Replace with your new Client ID
+const REDIRECT_URI = 'https://michaelo48.netlify.app';
 const SCOPES = 'playlist-read-private playlist-read-collaborative';
 
-window.loginToSpotify = loginToSpotify;
+// Generate code verifier and challenge for PKCE
+function generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const values = crypto.getRandomValues(new Uint8Array(length));
+    return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+}
 
+async function sha256(plain) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    return window.crypto.subtle.digest('SHA-256', data);
+}
+
+function base64encode(input) {
+    return btoa(String.fromCharCode(...new Uint8Array(input)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+}
 
 // Check if we're returning from Spotify auth
-if (window.location.hash.includes('access_token')) {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
+async function handleCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
     
-    if (token) {
-        localStorage.setItem('spotify_access_token', token);
-        // Clean up URL by removing the hash
-        window.history.replaceState(null, null, window.location.pathname);
+    if (code) {
+        const codeVerifier = localStorage.getItem('code_verifier');
+        
+        // Exchange code for token
+        const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: CLIENT_ID,
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: REDIRECT_URI,
+                code_verifier: codeVerifier,
+            }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.access_token) {
+            localStorage.setItem('spotify_access_token', data.access_token);
+            localStorage.removeItem('code_verifier');
+            // Clean up URL
+            window.history.replaceState(null, null, window.location.pathname);
+            // Reload to show playlists
+            location.reload();
+        }
     }
 }
+
+// Call this on page load
+handleCallback();
 
 // Check if user is authenticated
 let accessToken = localStorage.getItem('spotify_access_token');
 
 async function getSpotifyPlaylists() {
     if (!accessToken) {
-        return '<a href="#" onclick="loginToSpotify()">Login to Spotify</a>';
+        return '<a href="#" id="spotify-login-btn">Login to Spotify</a>';
     }
 
     try {
@@ -38,7 +81,7 @@ async function getSpotifyPlaylists() {
             if (response.status === 401) {
                 // Token expired
                 localStorage.removeItem('spotify_access_token');
-                return '<a href="#" onclick="loginToSpotify()">Login to Spotify</a>';
+                return '<a href="#" id="spotify-login-btn">Login to Spotify</a>';
             }
             throw new Error('Failed to fetch playlists');
         }
@@ -68,32 +111,24 @@ async function sideNav() {
     </div>`;
 }
 
-// Login function
-// Login function
-function loginToSpotify() {
-    console.log('=== SPOTIFY LOGIN DEBUG ===');
-    console.log('CLIENT_ID:', CLIENT_ID);
-    console.log('REDIRECT_URI:', REDIRECT_URI);
-    console.log('REDIRECT_URI (encoded):', encodeURIComponent(REDIRECT_URI));
+// Login function with PKCE
+async function loginToSpotify() {
+    const codeVerifier = generateRandomString(64);
+    const hashed = await sha256(codeVerifier);
+    const codeChallenge = base64encode(hashed);
     
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+    // Store code verifier for later
+    localStorage.setItem('code_verifier', codeVerifier);
     
-    console.log('Full Auth URL:', authUrl);
-    console.log('========================');
+    const authUrl = new URL('https://accounts.spotify.com/authorize');
+    authUrl.searchParams.append('client_id', CLIENT_ID);
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
+    authUrl.searchParams.append('scope', SCOPES);
+    authUrl.searchParams.append('code_challenge_method', 'S256');
+    authUrl.searchParams.append('code_challenge', codeChallenge);
     
-    window.location.href = authUrl;
-}
-
-// Handle OAuth callback (add this to your callback page)
-function handleSpotifyCallback() {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get('access_token');
-    
-    if (token) {
-        localStorage.setItem('spotify_access_token', token);
-        window.location.href = '/'; // Redirect back to main page
-    }
+    window.location.href = authUrl.toString();
 }
 
 // Initialize sidebar
@@ -103,6 +138,15 @@ async function initSidebar() {
     if (sideNavElement) {
         console.log('sidebar loaded');
         sideNavElement.innerHTML = await sideNav();
+        
+        // Add event listener for login button
+        const loginBtn = document.getElementById('spotify-login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginToSpotify();
+            });
+        }
     }
 }
 
