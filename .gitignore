@@ -3,6 +3,8 @@
 .env.local
 *.pem
 *.key
+Roadmap.md
+node_modules/
 
 # OS-generated files
 .DS_Store
