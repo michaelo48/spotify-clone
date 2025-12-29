@@ -11,6 +11,7 @@
     padding-top: var(--spacing-5xl);
     transition: transform var(--transition-speed) var(--transition-ease);
     z-index: var(--z-sidebar);
+    overflow: auto;
 }
 
 .sidenav.collapsed {
