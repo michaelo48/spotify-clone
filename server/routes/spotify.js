@@ -11,7 +11,7 @@ router.get('/*path', async (req, res) => {
         return res.status(401).json({ error: 'Not authenticated' });
     }
     
-    const path = req.params[0];
+    const path = req.params.path.join('/');
     const queryString = new URLSearchParams(req.query).toString();
     
     let spotifyUrl = `https://api.spotify.com/v1/${path}`;

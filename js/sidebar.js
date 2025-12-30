@@ -34,7 +34,7 @@ async function getSpotifyPlaylists() {
             const recentData = await recentResponse.json();
             console.log('Recent data:', recentData);
             
-            recentData.items.forEach(item => {
+            recentData.items?.forEach(item => {
                 const context = item.context;
                 if (context && context.type === 'playlist' && !recentPlaylistUris.includes(context.uri)) {
                     recentPlaylistUris.push(context.uri);
@@ -45,7 +45,7 @@ async function getSpotifyPlaylists() {
         }
 
         // Sort playlists: recently played first, then the rest
-        const playlists = playlistsData.items;
+        const playlists = playlistsData.items || [];
         const sortedPlaylists = playlists.sort((a, b) => {
             const aIndex = recentPlaylistUris.indexOf(a.uri);
             const bIndex = recentPlaylistUris.indexOf(b.uri);
