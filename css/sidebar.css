@@ -3,10 +3,10 @@
 /* Sidebar */
 .sidenav {
     width: var(--sidebar-width);
-    height: 100%;
     position: fixed;
     top: 0;
     left: 0;
+    bottom: var(--footer-height);
     background-color: var(--color-primary);
     padding-top: var(--spacing-5xl);
     transition: transform var(--transition-speed) var(--transition-ease);
@@ -19,14 +19,14 @@
 }
 
 .sidenav a {
-    display: block;
+    display: flex;
     padding: var(--spacing-lg) var(--spacing-2xl);
     color: var(--color-white);
     text-decoration: none;
     font-size: var(--font-size-base);
 }
 
-.sidenav a:hover {
+.playlist-item:hover {
     background-color: var(--color-primary-hover);
 }
 
@@ -43,4 +43,34 @@
     cursor: pointer;
     font-size: var(--font-size-lg);
     border-radius: var(--radius-md);
+}
+
+.playlist-item{
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md) ;
+    padding: var(--spacing-sm)
+}
+
+.albumImage{
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.PlaylistName{
+    color: var(--color-white);
+    text-decoration: none;
+    font-size: var(--font-size-base);
+}
+
+.playlist-item a {
+    flex: 1;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    padding-left: var(--spacing-md);
 }

@@ -1,6 +1,10 @@
 @import url('root.css');
 
 footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--footer-height);
     background: var(--color-primary);
     color: var(--color-white);
     padding: 15px 20px;
@@ -9,4 +13,14 @@ footer {
     left: 0;
     right: 0;
     z-index: var(--z-footer);
+    
+    .artistInfo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-lg);
+    }
 }
+
+
+

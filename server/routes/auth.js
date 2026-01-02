@@ -11,7 +11,7 @@ const router = express.Router();
 // - playlist-read-collaborative: Access collaborative playlists
 // - user-read-recently-played: See what they've listened to recently
 // You can add more scopes later as you add features (like playback control)
-const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played';
+const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state';
 
 // Default settings for all cookies we set
 // These options make cookies secure and inaccessible to JavaScript
@@ -238,7 +238,20 @@ router.get('/status', (req, res) => {
     const hasToken = !!req.cookies.spotify_access_token;
     res.json({ loggedIn: hasToken });
 });
-
+// ============================================
+// ROUTE: /api/auth/token
+// ============================================
+// PURPOSE: Return the access token for the Web Playback SDK
+// The SDK needs the raw token - it can't use cookies
+router.get('/token', (req, res) => {
+    const accessToken = req.cookies.spotify_access_token;
+    
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    res.json({ access_token: accessToken });
+});
 
 // Export the router so server.js can use it
 export default router;

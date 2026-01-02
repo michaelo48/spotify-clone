@@ -42,6 +42,8 @@
     /* Dimensions */
     --search-input-height: 1.25rem;
     --search-input-width: 10rem;
+
+    --footer-height: 70px;
 }
 
 /* Reset default browser spacing */

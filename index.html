@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/player.css">
 </head>
 <body>
     <!-- Toggle Button -->
@@ -33,14 +34,35 @@
             </div>
         </main>
 
-        <footer>
-            <div class="playing">
+        <footer style="background-color: red">
+            <div  class="artistInfo">
+                <div>
+                    <img class="albumImage" src="https://placehold.co/50x50" alt="">
+                </div>
+                <div>
+                    <p class="songTitle">Song Title</p>
+                    <p class="artistName ">Artist Name</p>
+                </div>
+                <div>
+                    <button class="hideButton">Hide</button>
+                    <button class="likeButton">Like</button>
+                </div>
+            </div>
+            <div  class="nowPlaying">
+                <button id="togglePlay">Toggle Play</button>
                 <p>Now Playing: Song Title - Artist Name</p>
             </div>
+            <div  class="volumeControl">
+                <p>Now Playing: Song Title - Artist Name</p>
+            </div>
+
         </footer>
     </div>
 
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script src="js/player.js"></script>
     <script src="js/search-bar.js"></script>
     <script src="js/sidebar.js"></script>
+    
 </body>
 </html>
