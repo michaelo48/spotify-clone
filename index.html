@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=play_circle,repeat,shuffle,skip_next,skip_previous" />
+
 </head>
 <body>
     <!-- Toggle Button -->
@@ -34,7 +36,7 @@
             </div>
         </main>
 
-        <footer style="background-color: red">
+        <footer style="background-color: rgb(0, 0, 0)">
             <div  class="artistInfo">
                 <div>
                     <img class="albumImage" src="https://placehold.co/50x50" alt="">
@@ -44,16 +46,22 @@
                     <p class="artistName ">Artist Name</p>
                 </div>
                 <div>
-                    <button class="hideButton">Hide</button>
-                    <button class="likeButton">Like</button>
+                    <button class="hideButton" data-lucide="circle-minus"></button>
+                    <button class="likeButton" data-lucide="circle-plus"></button>
                 </div>
             </div>
             <div  class="nowPlaying">
-                <button id="togglePlay">Toggle Play</button>
+                <div class="playbackControls">
+                <span id="shuffle" class="material-symbols-outlined">shuffle</span>
+                <span id="prevTrack" class="material-symbols-outlined">skip_previous</span>
+                <span id="togglePlay" class="material-symbols-outlined">play_circle</span>
+                <span id="nextTrack" class="material-symbols-outlined">skip_next</span>
+                <span id="repeat" class="material-symbols-outlined">repeat</span>
+                </div>
                 <p>Now Playing: Song Title - Artist Name</p>
             </div>
             <div  class="volumeControl">
-                <p>Now Playing: Song Title - Artist Name</p>
+                <input type="range" id="volume" name="volume" min="0" max="100" value="20">
             </div>
 
         </footer>
@@ -63,6 +71,11 @@
     <script src="js/player.js"></script>
     <script src="js/search-bar.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+
     
 </body>
 </html>

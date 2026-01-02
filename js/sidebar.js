@@ -47,7 +47,7 @@ async function getSpotifyPlaylists() {
             
             playlistHTML += `
             <div class="playlist-item">
-                <button type='button' onclick="window.open('${playlist.external_urls.spotify}', '_blank')">
+                <button type='button' onclick="playPlaylist('${playlist.uri}')">
                 <img class="albumImage" src="${imageUrl}" alt="${playlist.name}">
                 </button>
                 <a class="PlaylistName" href="${playlist.external_urls.spotify}" target="_blank">${playlist.name}</a>
