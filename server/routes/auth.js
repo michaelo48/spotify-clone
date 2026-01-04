@@ -11,14 +11,16 @@ const router = express.Router();
 // - playlist-read-collaborative: Access collaborative playlists
 // - user-read-recently-played: See what they've listened to recently
 // You can add more scopes later as you add features (like playback control)
-const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state';
+const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state user-read-email user-read-private';
+// Frontend URL for redirects after auth
+const FRONTEND_URL = process.env.FRONTEND_URL || '';
 
 // Default settings for all cookies we set
 // These options make cookies secure and inaccessible to JavaScript
 const cookieOptions = {
     httpOnly: true,        // JavaScript cannot read this cookie (protects against XSS attacks)
     secure: process.env.NODE_ENV === 'production',  // Only send over HTTPS in production
-    sameSite: 'lax',       // Cookie sent with same-site requests and top-level navigations (protects against CSRF)
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' required for cross-origin cookies
     path: '/'              // Cookie is available on all routes
 };
 
@@ -70,12 +72,12 @@ router.get('/callback', async (req, res) => {
     
     // If Spotify sent an error, redirect home with the error message
     if (error) {
-        return res.redirect('/?error=' + error);
+        return res.redirect(`${FRONTEND_URL}/?error=${error}`);
     }
     
     // If there's no code, something went wrong
     if (!code) {
-        return res.redirect('/?error=no_code');
+        return res.redirect(`${FRONTEND_URL}/?error=no_code`);
     }
     
     try {
@@ -101,7 +103,7 @@ router.get('/callback', async (req, res) => {
         
         // If Spotify returned an error, redirect with that error
         if (data.error) {
-            return res.redirect('/?error=' + data.error);
+            return res.redirect(`${FRONTEND_URL}/?error=${data.error}`);
         }
         
         // SUCCESS! We have tokens. Now store them in cookies.
@@ -121,11 +123,11 @@ router.get('/callback', async (req, res) => {
         });
         
         // Redirect to home page - the user is now logged in!
-        res.redirect('/');
+        res.redirect(`${FRONTEND_URL}/`);
         
     } catch (error) {
         console.error('Token exchange error:', error);
-        res.redirect('/?error=token_exchange_failed');
+        res.redirect(`${FRONTEND_URL}/?error=token_exchange_failed`);
     }
 });
 

@@ -19,6 +19,67 @@ footer {
         justify-content: space-between;
         align-items: center;
         gap: var(--spacing-lg);
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .artistInfo > div:nth-child(2) {
+        overflow: hidden;
+        max-width: 150px;
+    }
+
+    .trackInfo {
+        max-width: 150px;
+        overflow: hidden;
+    }
+
+    .marquee {
+        overflow: hidden;
+        white-space: nowrap;
+        width: 150px;
+    }
+
+    .songTitle, .artistName {
+        display: inline-block;
+        white-space: nowrap;
+        padding-right: 50px;
+        min-width: max-content;
+    }
+
+    .marquee.scrolling .songTitle,
+    .marquee.scrolling .artistName {
+        animation: marquee 6s linear infinite;
+    }
+
+    @keyframes marquee {
+        0%, 10% {
+            transform: translateX(0);
+        }
+        45%, 55% {
+            transform: translateX(calc(-100% + 150px));
+        }
+        90%, 100% {
+            transform: translateX(0);
+        }
+    }
+
+    .nowPlaying {
+        flex: 2;
+    }
+
+    .volumeControl {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .artistInfo button {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        color: var(--color-white);
     }
     
 
@@ -32,6 +93,34 @@ footer {
     justify-content: center;
     align-items: center;
     gap: var(--spacing-xl);
+}
+
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.progressContainer span {
+    font-size: var(--font-size-sm, 12px);
+    color: var(--color-white);
+    min-width: 40px;
+}
+
+.currentTime {
+    text-align: right;
+}
+
+.totalTime {
+    text-align: left;
+}
+
+#progressBar {
+    flex: 1;
+    height: 4px;
+    cursor: pointer;
 }
 
 

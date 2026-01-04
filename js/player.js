@@ -1,5 +1,35 @@
 let player;
 let deviceId = null;
+let progressInterval = null;
+let currentState = null;
+
+// Helper function to format milliseconds to mm:ss
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Update progress bar UI
+function updateProgressBar() {
+    if (!currentState || currentState.paused) return;
+    
+    const position = currentState.position + (Date.now() - currentState.timestamp);
+    const duration = currentState.duration;
+    
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.querySelector('.currentTime');
+    
+    if (progressBar && duration > 0) {
+        const percentage = (position / duration) * 100;
+        progressBar.value = Math.min(percentage, 100);
+    }
+    
+    if (currentTimeEl) {
+        currentTimeEl.textContent = formatTime(Math.min(position, duration));
+    }
+}
 
 
 
@@ -64,12 +94,23 @@ window.onSpotifyWebPlaybackSDKReady = async () => {
     console.log('Spotify Web Playback SDK is ready.');
     }
 
+    // Seeking functionality
+    document.getElementById('progressBar').oninput = async function(event) {
+        if (!currentState) return;
+        
+        const percentage = event.target.value;
+        const seekPosition = Math.floor((percentage / 100) * currentState.duration);
+        
+        await player.seek(seekPosition);
+        console.log('Seeked to', formatTime(seekPosition));
+    }
+
 
 };
 
 async function getAccessToken() {
     // Get token from our backend (stored in cookie, but we need it for the SDK)
-    const response = await fetch('/api/auth/token', { credentials: 'include' });
+    const response = await fetch(`${API_URL}/api/auth/token`, { credentials: 'include' });
     if (!response.ok) {
         console.log('Failed to get access token');
         return null;
@@ -101,6 +142,81 @@ async function initPlayer() {
     // Not Ready - device went offline
     player.addListener('not_ready', ({ device_id }) => {
         console.log('Device has gone offline:', device_id);
+    });
+    player.addListener('player_state_changed', (state) => {
+        if (!state) return;  // No state means nothing is playing
+        
+        const currentTrack = state.track_window.current_track;
+        const duration = currentTrack.duration_ms;
+        const position = state.position;
+        
+        currentState = {
+            position: position,
+            duration: duration,
+            paused: state.paused,
+            timestamp: Date.now()
+        };
+        
+        const albumImage = document.querySelector('footer .albumImage');
+        if (currentTrack.album.images && currentTrack.album.images.length > 0) {
+            albumImage.src = currentTrack.album.images[0].url;
+        } else {
+            console.log('No album images found:', currentTrack.album);
+        }
+        
+        // Update song title
+        const songTitleEl = document.querySelector('footer .songTitle');
+        songTitleEl.textContent = currentTrack.name;
+        const songMarquee = songTitleEl.parentElement;
+        songMarquee.classList.remove('scrolling');
+        
+        // Update artist name(s) - join multiple artists with commas
+        const artistNames = currentTrack.artists.map(artist => artist.name).join(', ');
+        const artistNameEl = document.querySelector('footer .artistName');
+        artistNameEl.textContent = artistNames;
+        const artistMarquee = artistNameEl.parentElement;
+        artistMarquee.classList.remove('scrolling');
+        
+        // Check for overflow and add scrolling class to marquee wrapper
+        setTimeout(() => {
+            if (songTitleEl.offsetWidth > songMarquee.offsetWidth) {
+                songMarquee.classList.add('scrolling');
+            }
+            
+            if (artistNameEl.offsetWidth > artistMarquee.offsetWidth) {
+                artistMarquee.classList.add('scrolling');
+            }
+        }, 50);
+        
+        // Update progress bar
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.querySelector('.currentTime');
+        const totalTimeEl = document.querySelector('.totalTime');
+        
+        if (progressBar && duration > 0) {
+            const percentage = (position / duration) * 100;
+            progressBar.value = percentage;
+        }
+        
+        if (currentTimeEl) {
+            currentTimeEl.textContent = formatTime(position);
+        }
+        
+        if (totalTimeEl) {
+            totalTimeEl.textContent = formatTime(duration);
+        }
+        
+        // Start/stop progress interval based on playback state
+        if (state.paused) {
+            clearInterval(progressInterval);
+        } else {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgressBar, 1000);
+        }
+        
+        // Update play/pause icon based on paused state
+        const togglePlayIcon = document.getElementById('togglePlay');
+        togglePlayIcon.textContent = state.paused ? 'play_circle' : 'pause_circle';
     });
 
     // Errors

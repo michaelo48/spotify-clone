@@ -1,8 +1,8 @@
 async function getSpotifyPlaylists() {
     try {
         const [playlistsResponse, recentResponse] = await Promise.all([
-            fetch('/api/spotify/me/playlists', { credentials: 'include' }),
-            fetch('/api/spotify/me/player/recently-played?limit=50', { credentials: 'include' })
+            fetch(`${API_URL}/api/spotify/me/playlists`, { credentials: 'include' }),
+            fetch(`${API_URL}/api/spotify/me/player/recently-played?limit=50`, { credentials: 'include' })
         ]);
 
         if (playlistsResponse.status === 401) {
@@ -47,7 +47,7 @@ async function getSpotifyPlaylists() {
             
             playlistHTML += `
             <div class="playlist-item">
-                <button type='button' onclick="playPlaylist('${playlist.uri}')">
+                <button type="button" onclick="playPlaylist('${playlist.uri}')">
                 <img class="albumImage" src="${imageUrl}" alt="${playlist.name}">
                 </button>
                 <a class="PlaylistName" href="${playlist.external_urls.spotify}" target="_blank">${playlist.name}</a>
@@ -71,7 +71,7 @@ async function sideNav() {
 }
 
 function loginToSpotify() {
-    window.location.href = '/api/auth/login';
+    window.location.href = `${API_URL}/api/auth/login`;
 }
 
 async function initSidebar() {

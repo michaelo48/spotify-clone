@@ -21,7 +21,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'https://michaelo48.netlify.app'  // Your Netlify domain
+    ],
     credentials: true
 }));
 app.use(express.json());
