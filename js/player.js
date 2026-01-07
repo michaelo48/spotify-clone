@@ -41,6 +41,7 @@ function updateFooterWithTrack(track, isPlaying = false, position = 0) {
     // Update song title
     const songTitleEl = document.querySelector('footer .songTitle');
     songTitleEl.textContent = track.name;
+    songTitleEl.setAttribute('data-text', track.name);
     const songMarquee = songTitleEl.parentElement;
     songMarquee.classList.remove('scrolling');
 
@@ -48,6 +49,7 @@ function updateFooterWithTrack(track, isPlaying = false, position = 0) {
     const artistNames = track.artists.map(artist => artist.name).join(', ');
     const artistNameEl = document.querySelector('footer .artistName');
     artistNameEl.textContent = artistNames;
+    artistNameEl.setAttribute('data-text', artistNames);
     const artistMarquee = artistNameEl.parentElement;
     artistMarquee.classList.remove('scrolling');
 
@@ -84,7 +86,7 @@ function updateFooterWithTrack(track, isPlaying = false, position = 0) {
     togglePlayIcon.textContent = isPlaying ? 'pause_circle' : 'play_circle';
 }
 
-// Fetch currently playing track from Spotify
+// Fetch currently playing track from Spotify and transfer playback
 async function fetchCurrentlyPlaying() {
     try {
         const token = await getAccessToken();
@@ -110,20 +112,29 @@ async function fetchCurrentlyPlaying() {
             updateFooterWithTrack(data.item, data.is_playing, data.progress_ms);
 
             // Store state for progress updates
+            currentState = {
+                position: data.progress_ms,
+                duration: data.item.duration_ms,
+                paused: !data.is_playing,
+                timestamp: Date.now()
+            };
+
             if (data.is_playing) {
-                currentState = {
-                    position: data.progress_ms,
-                    duration: data.item.duration_ms,
-                    paused: !data.is_playing,
-                    timestamp: Date.now()
-                };
                 clearInterval(progressInterval);
                 progressInterval = setInterval(updateProgressBar, 1000);
             }
+
+            // Store the context and position to transfer playback later
+            return {
+                context_uri: data.context?.uri,
+                uris: data.context ? null : [data.item.uri],
+                position_ms: data.progress_ms
+            };
         }
     } catch (error) {
         console.error('Error fetching currently playing track:', error);
     }
+    return null;
 }
 
 
@@ -224,7 +235,7 @@ async function initPlayer() {
     }
 
     // Fetch and display currently playing song
-    await fetchCurrentlyPlaying();
+    const playbackInfo = await fetchCurrentlyPlaying();
 
     player = new Spotify.Player({
         name: 'MichaelsMusic Web Player',
@@ -233,8 +244,54 @@ async function initPlayer() {
     });
 
     // Ready - device is available
-    player.addListener('ready', ({ device_id }) => {
+    player.addListener('ready', async ({ device_id }) => {
         console.log('Ready with Device ID:', device_id);
+        deviceId = device_id;
+
+        // Transfer playback to this device if there's something playing
+        if (playbackInfo) {
+            try {
+                // First, transfer playback to this device
+                await fetch(`https://api.spotify.com/v1/me/player`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        device_ids: [device_id],
+                        play: false // Don't auto-play, keep current state
+                    })
+                });
+
+                // Wait a moment for transfer to complete
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Resume playback at the correct position
+                const playBody = {
+                    position_ms: playbackInfo.position_ms
+                };
+
+                if (playbackInfo.context_uri) {
+                    playBody.context_uri = playbackInfo.context_uri;
+                } else if (playbackInfo.uris) {
+                    playBody.uris = playbackInfo.uris;
+                }
+
+                await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(playBody)
+                });
+
+                console.log('Playback transferred to web player');
+            } catch (error) {
+                console.error('Error transferring playback:', error);
+            }
+        }
     });
 
     // Not Ready - device went offline
@@ -272,10 +329,6 @@ async function initPlayer() {
     player.addListener('authentication_error', ({ message }) => console.error(message));
     player.addListener('account_error', ({ message }) => console.error('Premium required:', message));
     player.addListener('playback_error', ({ message }) => console.error(message));
-    player.addListener('ready', ({ device_id }) => {
-    console.log('Ready with Device ID:', device_id);
-    deviceId = device_id;  // Store it globally
-    });
 
     // Connect
     player.connect();
