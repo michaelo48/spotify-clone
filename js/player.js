@@ -14,20 +14,115 @@ function formatTime(ms) {
 // Update progress bar UI
 function updateProgressBar() {
     if (!currentState || currentState.paused) return;
-    
+
     const position = currentState.position + (Date.now() - currentState.timestamp);
     const duration = currentState.duration;
-    
+
     const progressBar = document.getElementById('progressBar');
     const currentTimeEl = document.querySelector('.currentTime');
-    
+
     if (progressBar && duration > 0) {
         const percentage = (position / duration) * 100;
         progressBar.value = Math.min(percentage, 100);
     }
-    
+
     if (currentTimeEl) {
         currentTimeEl.textContent = formatTime(Math.min(position, duration));
+    }
+}
+
+// Update footer UI with track info
+function updateFooterWithTrack(track, isPlaying = false, position = 0) {
+    const albumImage = document.querySelector('footer .albumImage');
+    if (track.album.images && track.album.images.length > 0) {
+        albumImage.src = track.album.images[0].url;
+    }
+
+    // Update song title
+    const songTitleEl = document.querySelector('footer .songTitle');
+    songTitleEl.textContent = track.name;
+    const songMarquee = songTitleEl.parentElement;
+    songMarquee.classList.remove('scrolling');
+
+    // Update artist name(s)
+    const artistNames = track.artists.map(artist => artist.name).join(', ');
+    const artistNameEl = document.querySelector('footer .artistName');
+    artistNameEl.textContent = artistNames;
+    const artistMarquee = artistNameEl.parentElement;
+    artistMarquee.classList.remove('scrolling');
+
+    // Check for overflow and add scrolling class
+    setTimeout(() => {
+        if (songTitleEl.offsetWidth > songMarquee.offsetWidth) {
+            songMarquee.classList.add('scrolling');
+        }
+        if (artistNameEl.offsetWidth > artistMarquee.offsetWidth) {
+            artistMarquee.classList.add('scrolling');
+        }
+    }, 50);
+
+    // Update progress bar and time
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.querySelector('.currentTime');
+    const totalTimeEl = document.querySelector('.totalTime');
+
+    if (progressBar && track.duration_ms > 0) {
+        const percentage = (position / track.duration_ms) * 100;
+        progressBar.value = percentage;
+    }
+
+    if (currentTimeEl) {
+        currentTimeEl.textContent = formatTime(position);
+    }
+
+    if (totalTimeEl) {
+        totalTimeEl.textContent = formatTime(track.duration_ms);
+    }
+
+    // Update play/pause icon
+    const togglePlayIcon = document.getElementById('togglePlay');
+    togglePlayIcon.textContent = isPlaying ? 'pause_circle' : 'play_circle';
+}
+
+// Fetch currently playing track from Spotify
+async function fetchCurrentlyPlaying() {
+    try {
+        const token = await getAccessToken();
+        if (!token) {
+            console.log('No token available');
+            return;
+        }
+
+        const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 204 || !response.ok) {
+            console.log('No track currently playing');
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data && data.item) {
+            updateFooterWithTrack(data.item, data.is_playing, data.progress_ms);
+
+            // Store state for progress updates
+            if (data.is_playing) {
+                currentState = {
+                    position: data.progress_ms,
+                    duration: data.item.duration_ms,
+                    paused: !data.is_playing,
+                    timestamp: Date.now()
+                };
+                clearInterval(progressInterval);
+                progressInterval = setInterval(updateProgressBar, 1000);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching currently playing track:', error);
     }
 }
 
@@ -121,12 +216,15 @@ async function getAccessToken() {
 
 async function initPlayer() {
     const token = await getAccessToken();
-    
+
     if (!token) {
         console.log('No token - user not logged in');
-        
+
         return;
     }
+
+    // Fetch and display currently playing song
+    await fetchCurrentlyPlaying();
 
     player = new Spotify.Player({
         name: 'MichaelsMusic Web Player',
@@ -145,67 +243,21 @@ async function initPlayer() {
     });
     player.addListener('player_state_changed', (state) => {
         if (!state) return;  // No state means nothing is playing
-        
+
         const currentTrack = state.track_window.current_track;
         const duration = currentTrack.duration_ms;
         const position = state.position;
-        
+
         currentState = {
             position: position,
             duration: duration,
             paused: state.paused,
             timestamp: Date.now()
         };
-        
-        const albumImage = document.querySelector('footer .albumImage');
-        if (currentTrack.album.images && currentTrack.album.images.length > 0) {
-            albumImage.src = currentTrack.album.images[0].url;
-        } else {
-            console.log('No album images found:', currentTrack.album);
-        }
-        
-        // Update song title
-        const songTitleEl = document.querySelector('footer .songTitle');
-        songTitleEl.textContent = currentTrack.name;
-        const songMarquee = songTitleEl.parentElement;
-        songMarquee.classList.remove('scrolling');
-        
-        // Update artist name(s) - join multiple artists with commas
-        const artistNames = currentTrack.artists.map(artist => artist.name).join(', ');
-        const artistNameEl = document.querySelector('footer .artistName');
-        artistNameEl.textContent = artistNames;
-        const artistMarquee = artistNameEl.parentElement;
-        artistMarquee.classList.remove('scrolling');
-        
-        // Check for overflow and add scrolling class to marquee wrapper
-        setTimeout(() => {
-            if (songTitleEl.offsetWidth > songMarquee.offsetWidth) {
-                songMarquee.classList.add('scrolling');
-            }
-            
-            if (artistNameEl.offsetWidth > artistMarquee.offsetWidth) {
-                artistMarquee.classList.add('scrolling');
-            }
-        }, 50);
-        
-        // Update progress bar
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeEl = document.querySelector('.currentTime');
-        const totalTimeEl = document.querySelector('.totalTime');
-        
-        if (progressBar && duration > 0) {
-            const percentage = (position / duration) * 100;
-            progressBar.value = percentage;
-        }
-        
-        if (currentTimeEl) {
-            currentTimeEl.textContent = formatTime(position);
-        }
-        
-        if (totalTimeEl) {
-            totalTimeEl.textContent = formatTime(duration);
-        }
-        
+
+        // Update footer with current track info
+        updateFooterWithTrack(currentTrack, !state.paused, position);
+
         // Start/stop progress interval based on playback state
         if (state.paused) {
             clearInterval(progressInterval);
@@ -213,10 +265,6 @@ async function initPlayer() {
             clearInterval(progressInterval);
             progressInterval = setInterval(updateProgressBar, 1000);
         }
-        
-        // Update play/pause icon based on paused state
-        const togglePlayIcon = document.getElementById('togglePlay');
-        togglePlayIcon.textContent = state.paused ? 'play_circle' : 'pause_circle';
     });
 
     // Errors
