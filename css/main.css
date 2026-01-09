@@ -7,7 +7,7 @@
 }
 
 .main-wrapper.expanded {
-    margin-left: var(--spacing-4xl);
+    margin-left: 80px;
 }
 
 /* Main Content */

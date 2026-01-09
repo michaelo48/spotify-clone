@@ -36,7 +36,7 @@ async function getSpotifyPlaylists() {
             return 0;
         });
 
-        let playlistHTML = `<a href="https://open.spotify.com/collection/tracks" target="_blank">♥ Liked Songs</a>`;
+        let playlistHTML = ``;
         
         sortedPlaylists.forEach(playlist => {
             let imageUrl = 'placeholder.png';
@@ -64,9 +64,17 @@ async function getSpotifyPlaylists() {
 async function sideNav() {
     const playlistsHTML = await getSpotifyPlaylists();
     return `<div class="sidenav">
-        <a href="#">Open Your Library</a>
-        <a href="#">Create Playlist</a>
-        ${playlistsHTML}
+        <div class="sidebar-header">
+            <a href="#">Open Your Library</a>
+            <a href="#">Create Playlist</a>
+            <a href="https://open.spotify.com/collection/tracks" target="_blank" class="liked-songs">
+                <span class="liked-songs-icon">♥</span>
+                <span class="liked-songs-text">Liked Songs</span>
+            </a>
+        </div>
+        <div class="sidebar-playlists">
+            ${playlistsHTML}
+        </div>
     </div>`;
 }
 
@@ -85,18 +93,19 @@ async function initSidebar() {
                 loginToSpotify();
             });
         }
+
+        // Setup toggle AFTER sidebar is created
+        const toggleBtn = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidenav');
+        const mainWrapper = document.querySelector('.main-wrapper');
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainWrapper.classList.toggle('expanded');
+            });
+        }
     }
 }
 
 initSidebar();
-
-const toggleBtn = document.querySelector('.menu-toggle');
-const sidebar = document.querySelector('.sidenav');
-const mainWrapper = document.querySelector('.main-wrapper');
-
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        mainWrapper.classList.toggle('expanded');
-    });
-}

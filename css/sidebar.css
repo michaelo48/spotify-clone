@@ -9,13 +9,60 @@
     bottom: var(--footer-height);
     background-color: var(--color-primary);
     padding-top: var(--spacing-5xl);
-    transition: transform var(--transition-speed) var(--transition-ease);
+    transition: width var(--transition-speed) var(--transition-ease);
     z-index: var(--z-sidebar);
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    flex-shrink: 0;
+}
+
+.sidebar-playlists {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .sidenav.collapsed {
-    transform: translateX(var(--sidebar-collapsed-offset));
+    width: 80px;
+}
+
+.sidenav.collapsed .sidebar-header > a:not(.liked-songs) {
+    display: none;
+}
+
+.liked-songs {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.sidenav.collapsed .liked-songs {
+    justify-content: center;
+}
+
+.sidenav.collapsed .liked-songs-text {
+    display: none;
+}
+
+.sidenav.collapsed .liked-songs-icon {
+    font-size: var(--font-size-lg);
+}
+
+.sidenav.collapsed .sidebar-playlists > a {
+    display: none;
+}
+
+.sidenav.collapsed .playlist-item {
+    justify-content: center;
+    padding: var(--spacing-sm);
+}
+
+.sidenav.collapsed .playlist-item a.PlaylistName {
+    display: none;
 }
 
 .sidenav a {
