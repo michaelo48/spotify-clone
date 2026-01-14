@@ -1,0 +1,291 @@
+/* ===========================================
+   CARD COMPONENTS
+   Reusable card styles for playlists, albums, artists
+   =========================================== */
+
+/* Card Grid Container */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+    padding: 16px 0;
+}
+
+/* Individual Card */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 16px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Card Image Container */
+.card-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Artist cards get circular images */
+.card.artist-card .card-image {
+    border-radius: 50%;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Placeholder for missing images */
+.card-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #450af5, #c4efd9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image-placeholder span {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Play Button Overlay */
+.card-play-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 48px;
+    height: 48px;
+    background: #1db954;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-play-btn:hover {
+    transform: translateY(0) scale(1.05);
+    background: #1ed760;
+}
+
+.card-play-btn span {
+    color: #000;
+    font-size: 24px;
+}
+
+.card:hover .card-play-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Card Text */
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: #a7a7a7;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+.card-row {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    padding: 16px 0;
+    scrollbar-width: none; /* Firefox */
+}
+
+.card-row::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.card-row .card {
+    flex: 0 0 180px;
+}
+
+
+.recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.recent-card {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 64px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.recent-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.recent-card-image {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.recent-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recent-card-title {
+    flex: 1;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recent-card-play {
+    width: 48px;
+    height: 48px;
+    margin-right: 8px;
+    background: #1db954;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.recent-card-play:hover {
+    background: #1ed760;
+    transform: scale(1.05);
+}
+
+.recent-card-play span {
+    color: #000;
+    font-size: 20px;
+}
+
+.recent-card:hover .recent-card-play {
+    opacity: 1;
+}
+
+
+.card.category-card {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    position: relative;
+}
+
+.card.category-card .card-image {
+    margin-bottom: 0;
+    border-radius: 8px;
+}
+
+.card.category-card .card-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    white-space: normal;
+    overflow: visible;
+}
+
+/* Category cards don't have play buttons */
+.card.category-card .card-play-btn {
+    display: none;
+}
+
+/* Colorful hover effect for categories */
+.card.category-card:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.06) 25%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.06) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.card.skeleton .card-image {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card.skeleton .card-title,
+.card.skeleton .card-subtitle {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.card.skeleton .card-title {
+    width: 80%;
+    margin-bottom: 8px;
+}
+
+.card.skeleton .card-subtitle {
+    width: 60%;
+}

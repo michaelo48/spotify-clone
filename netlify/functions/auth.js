@@ -1,6 +1,6 @@
 // Netlify Function: Auth handler for Spotify OAuth
 
-const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state user-read-email user-read-private';
+const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state user-read-email user-read-private user-library-read user-library-modify';
 
 // Parse cookies from header
 function parseCookies(cookieHeader) {

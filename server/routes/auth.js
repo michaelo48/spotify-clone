@@ -11,7 +11,7 @@ const router = express.Router();
 // - playlist-read-collaborative: Access collaborative playlists
 // - user-read-recently-played: See what they've listened to recently
 // You can add more scopes later as you add features (like playback control)
-const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state user-read-email user-read-private';
+const SCOPES = 'playlist-read-private playlist-read-collaborative user-read-recently-played streaming user-read-playback-state user-modify-playback-state user-read-email user-read-private user-library-read user-library-modify';
 // Frontend URL for redirects after auth
 const FRONTEND_URL = process.env.FRONTEND_URL || '';
 

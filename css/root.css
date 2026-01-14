@@ -7,6 +7,9 @@
     --color-white: #fff;
     --color-white-rgb: 255, 255, 255;
     --color-background-dark: rgb(30, 30, 30);
+    --color-spotify-green: #1db954;
+    --color-spotify-green-hover: #1ed760;
+    --color-text-subdued: #a7a7a7;
 
     /* Spacing */
     --spacing-xs: 0.0625rem;
@@ -64,4 +67,6 @@ html, body {
     padding: 0;
     height: 100%;
     font-family: var(--font-family);
+    background-color: #121212;
+    color: #fff;
 }
